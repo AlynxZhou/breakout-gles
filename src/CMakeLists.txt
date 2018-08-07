@@ -1,0 +1,7 @@
+aux_source_directory("." BREAKOUT_SRCS)
+add_subdirectory("loaders")
+add_subdirectory("mvmath")
+set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+add_executable("breakout" ${BREAKOUT_SRCS})
+target_link_libraries("breakout" "loaders" "mvmath" "png" "GLESv2" "glfw" "m")

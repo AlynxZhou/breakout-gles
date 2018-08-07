@@ -10,16 +10,18 @@ GLuint load_png_texture(const char *const png_path)
 	png_uint_32 width = 0;
 	png_uint_32 height = 0;
 	png_byte color_type;
-	png_byte bit_depth;
+	// png_byte bit_depth;
 	png_struct *png_ptr = NULL;
 	png_info *info_ptr = NULL;
-	int number_of_passes = 0;
+	// int number_of_passes = 0;
 	png_byte **row_ptrs = NULL;
 	int pos = 0;
 	GLubyte *rgba = NULL;
 	FILE *fp = NULL;
-	if ((fp = fopen(png_path, "rb")) == NULL)
+	if ((fp = fopen(png_path, "rb")) == NULL) {
+		fprintf(stderr, "Open Error: Cannot find %s.", png_path);
 		return 0;
+	}
 	fread(header, 1, sizeof(header), fp);
 	if (png_sig_cmp(header, 0, 8)) {
 		fprintf(stderr, "Format Error: Not a valid PNG file.");
@@ -53,8 +55,8 @@ GLuint load_png_texture(const char *const png_path)
         color_type = png_get_color_type(png_ptr, info_ptr);
 	if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 	        png_set_swap_alpha(png_ptr);
-	bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-	number_of_passes = png_set_interlace_handling(png_ptr);
+	// bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+	// number_of_passes = png_set_interlace_handling(png_ptr);
 	png_read_update_info(png_ptr, info_ptr);
 	if (setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_info **)NULL);
@@ -69,7 +71,7 @@ GLuint load_png_texture(const char *const png_path)
 		row_ptrs[i] = (png_byte *)png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 	png_read_image(png_ptr, row_ptrs);
 	pos = width * height * 4 - 4 * width;
-	for(int row = 0; row < height; ++row) {
+	for(int row = height - 1; row >= 0; --row) {
 		for(int col = 0; col < (4 * width); col += 4) {
 			rgba[pos++] = row_ptrs[row][col + 1];    // red
 			rgba[pos++] = row_ptrs[row][col + 2];    // green
